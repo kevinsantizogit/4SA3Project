@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "462037896191",
+    "project_id": "sa3project-52e06",
+    "storage_bucket": "sa3project-52e06.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462037896191:android:90be70703eef7d6c2e35ca",
+        "android_client_info": {
+          "package_name": "ca.kevin.myfitnessapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD37wkijSg3s9zCavHIgQYjXsKtB5K9Mtc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
