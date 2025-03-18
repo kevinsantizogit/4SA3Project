@@ -1,40 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:layout_height="?attr/actionBarSize"
+        app:title="My Fitness App"/>
 
-    </com.google.android.material.appbar.AppBarLayout>
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <include layout="@layout/content_main" />
+        <EditText
+            android:id="@+id/editEmail"
+            android:layout_width="372dp"
+            android:layout_height="153dp"
+            android:hint="Enter email"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/editPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter password"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register" />
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Login" />
+
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginBottom="16dp"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        android:layout_margin="16dp"
+        app:srcCompat="@android:drawable/ic_dialog_email"/>
 
     <Button
         android:id="@+id/btnGetName"
-        android:layout_width="263dp"
-        android:layout_height="186dp"
-        android:text="Get Name" />
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize" />
-
+        android:layout_height="wrap_content"
+        android:text="Get Name from DB"
+        app:layout_anchor="@+id/linearLayout"
+        app:layout_anchorGravity="center" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
