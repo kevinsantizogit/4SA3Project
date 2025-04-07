@@ -3,25 +3,28 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/background">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:title="My Fitness App"/>
+        app:title="My Fitness App" />
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:alpha="0.7"
+        android:background="@color/white"
         android:padding="16dp">
 
         <EditText
             android:id="@+id/editEmail"
-            android:layout_width="372dp"
-            android:layout_height="153dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:hint="Enter email"
             android:inputType="textEmailAddress" />
 
@@ -29,6 +32,8 @@
             android:id="@+id/editPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/editEmail"
+            android:layout_marginTop="16dp"
             android:hint="Enter password"
             android:inputType="textPassword" />
 
@@ -36,15 +41,19 @@
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/editPassword"
+            android:layout_marginTop="16dp"
             android:text="Register" />
 
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/btnRegister"
+            android:layout_marginTop="8dp"
             android:text="Login" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
@@ -52,14 +61,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        app:srcCompat="@android:drawable/ic_dialog_email"/>
-
-    <Button
-        android:id="@+id/btnGetName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Get Name from DB"
-        app:layout_anchor="@+id/linearLayout"
-        app:layout_anchorGravity="center" />
+        app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

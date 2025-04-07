@@ -1,5 +1,6 @@
 package ca.kevin.myfitnessapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -50,11 +51,11 @@ public class MainActivity extends AppCompatActivity {
 
         Button btnSignUp = findViewById(R.id.btnRegister);
         Button btnSignIn = findViewById(R.id.btnLogin);
-        Button btnRetrieveUser = findViewById(R.id.btnGetName);
+
 
         btnSignUp.setOnClickListener(v -> createNewUser());
         btnSignIn.setOnClickListener(v -> signInUser());
-        btnRetrieveUser.setOnClickListener(v -> fetchUserFromDatabase());
+
 
         binding.fab.setOnClickListener(view -> {
             storeUserInfo("Kevin");
@@ -104,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         FirebaseUser user = authentication.getCurrentUser();
                         Toast.makeText(MainActivity.this, "Welcome, " + user.getEmail(), Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
+                        startActivity(intent);
+                        finish();
                     } else {
                         processAuthException(task.getException(), "Login Issue");
                     }
