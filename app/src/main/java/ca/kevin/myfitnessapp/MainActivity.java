@@ -11,10 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -24,126 +24,110 @@ import java.util.Map;
 import ca.kevin.myfitnessapp.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
+
     private ActivityMainBinding binding;
-    private FirebaseFirestore database;
-    private FirebaseAuth authentication;
-    private static final String TAG = "FirebaseIntegration";
+    private FirebaseFirestore firestore;
+    private FirebaseAuth auth;
+
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         FirebaseApp.initializeApp(this);
-        authentication = FirebaseAuth.getInstance();
-        database = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
 
-        if (authentication.getCurrentUser() != null) {
-            startActivity(new Intent(MainActivity.this, DashboardActivity.class));
+        if (auth.getCurrentUser() != null) {
+            startActivity(new Intent(this, DashboardActivity.class));
             finish();
             return;
         }
 
-        Button btnSignUp = findViewById(R.id.btnRegister);
-        Button btnSignIn = findViewById(R.id.btnLogin);
+        Button registerBtn = findViewById(R.id.btnRegister);
+        Button loginBtn = findViewById(R.id.btnLogin);
 
-        btnSignUp.setOnClickListener(v -> createNewUser());
-        btnSignIn.setOnClickListener(v -> signInUser());
+        registerBtn.setOnClickListener(v -> registerUser());
+        loginBtn.setOnClickListener(v -> loginUser());
 
-        fetchUserFromDatabase();
+        fetchAllUsers();
     }
 
-    private void createNewUser() {
+    private void registerUser() {
         EditText emailInput = findViewById(R.id.editEmail);
         EditText passwordInput = findViewById(R.id.editPassword);
+
         String email = emailInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please enter both email and password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Enter both email and password", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        authentication.createUserWithEmailAndPassword(email, password)
+        auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(MainActivity.this, "Successfully registered!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Registered successfully", Toast.LENGTH_SHORT).show();
                     } else {
-                        processAuthException(task.getException(), "Registration Error");
+                        handleAuthError(task.getException(), "Registration failed");
                     }
                 });
     }
 
-    private void signInUser() {
+    private void loginUser() {
         EditText emailInput = findViewById(R.id.editEmail);
         EditText passwordInput = findViewById(R.id.editPassword);
+
         String email = emailInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Email and password fields can't be blank", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Email and password required", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        authentication.signInWithEmailAndPassword(email, password)
+        auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        FirebaseUser user = authentication.getCurrentUser();
-                        Toast.makeText(MainActivity.this, "Welcome, " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
-                        startActivity(intent);
+                        FirebaseUser user = auth.getCurrentUser();
+                        Toast.makeText(this, "Welcome, " + user.getEmail(), Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(this, DashboardActivity.class));
                         finish();
                     } else {
-                        processAuthException(task.getException(), "Login Issue");
+                        handleAuthError(task.getException(), "Login failed");
                     }
                 });
     }
 
-    private void storeUserInfo(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            Toast.makeText(this, "Name can't be left blank", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("name", name);
-
-        database.collection("users")
-                .add(userData)
-                .addOnSuccessListener(documentReference -> Log.d(TAG, "User stored with ID: " + documentReference.getId()))
-                .addOnFailureListener(e -> {
-                    Log.w(TAG, "Failed to store user", e);
-                    Toast.makeText(MainActivity.this, "Error storing user data", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void fetchUserFromDatabase() {
-        database.collection("users")
+    private void fetchAllUsers() {
+        firestore.collection("users")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
-                        for (DocumentSnapshot document : task.getResult()) {
-                            String userName = document.getString("name");
-                            Log.d(TAG, "User fetched from DB: " + (userName != null ? userName : "unknown"));
+                        for (DocumentSnapshot doc : task.getResult()) {
+                            String name = doc.getString("name");
+                            Log.d(TAG, "User found: " + (name != null ? name : "Unnamed"));
                         }
                     } else {
-                        Log.w(TAG, "User retrieval failed", task.getException());
-                        Toast.makeText(MainActivity.this, "Unable to fetch user data", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "User fetch failed", task.getException());
+                        Toast.makeText(this, "Could not retrieve users", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    private void processAuthException(Exception exception, String errorContext) {
-        if (exception instanceof FirebaseAuthWeakPasswordException) {
-            Toast.makeText(this, "Password strength is weak. Use a stronger one", Toast.LENGTH_SHORT).show();
-        } else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
-            Toast.makeText(this, "Invalid credentials. Please check your email or password", Toast.LENGTH_SHORT).show();
-        } else if (exception instanceof FirebaseAuthInvalidUserException) {
-            Toast.makeText(this, "User not found. Please register first", Toast.LENGTH_SHORT).show();
+    private void handleAuthError(Exception e, String context) {
+        if (e instanceof FirebaseAuthWeakPasswordException) {
+            Toast.makeText(this, "Weak password. Please use a stronger one.", Toast.LENGTH_SHORT).show();
+        } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
+            Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show();
+        } else if (e instanceof FirebaseAuthInvalidUserException) {
+            Toast.makeText(this, "User not found. Please register.", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, errorContext + ": " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, context + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }
